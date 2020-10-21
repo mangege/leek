@@ -4,7 +4,7 @@ from sortedcontainers import SortedDict
 from . import logutils
 from . import utils
 
-logger = logutils.get_logger('tyche-bricklayer')
+logger = logutils.get_logger('leek-bricklayer')
 notifier = utils.get_airbrake_notifier()
 
 
