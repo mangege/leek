@@ -121,7 +121,7 @@ class Bricklayer(object):
 
     async def _timer_tasks(self):
         while True:
-            await asyncio.sleep(60)
+            await asyncio.sleep(300)
             try:
                 await self.update_balance()
                 await self.update_open_orders()
