@@ -30,6 +30,8 @@ class Bricklayer(object):
         self.exchange2_asks = SortedDict()
         self.exchange2_bids = SortedDict()
 
+        self.api_call_lock = asyncio.Lock()
+
     async def update_balance(self):
         try:
             datas = await asyncio.gather(self.exchange1.fetch_balance(), self.exchange2.fetch_balance())
@@ -121,10 +123,11 @@ class Bricklayer(object):
 
     async def _timer_tasks(self):
         while True:
-            await asyncio.sleep(300)
+            await asyncio.sleep(180)
             try:
-                await self.update_balance()
-                await self.update_open_orders()
+                async with self.api_call_lock:
+                    await self.update_balance()
+                    await self.update_open_orders()
             except Exception as e:
                 logger.exception(e)
 
@@ -224,8 +227,9 @@ class Bricklayer(object):
             buy_num = self.get_max_buy_num_limit(min_price)
 
         try:
-            await self._move_brick_trading(kind, ask_exchange, bid_exchange, ask, bid, buy_num, pure_profit)
-            await self.update_balance()
+            async with self.api_call_lock:
+                await self._move_brick_trading(kind, ask_exchange, bid_exchange, ask, bid, buy_num, pure_profit)
+                await self.update_balance()
         except Exception as e:
             logger.exception(e)
             await self.update_balance()
