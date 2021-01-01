@@ -101,7 +101,9 @@ class Bricklayer(object):
             except Exception as e:
                 prohibited_transaction = True
                 logger.exception(e)
-                notifier.notify(e)
+                notice = notifier.build_notice(e)
+                notice['params']['name'] = self.config.name
+                notifier.send_notice(notice)
 
     async def run(self):
         # load dep data
