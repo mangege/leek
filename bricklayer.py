@@ -1,4 +1,5 @@
 import asyncio
+import ccxt
 import ccxtws
 from sortedcontainers import SortedDict
 from . import logutils
@@ -111,6 +112,8 @@ class Bricklayer(object):
         await self.exchange2.load_markets()
         self.exchange1.checkRequiredCredentials()
         self.exchange2.checkRequiredCredentials()
+        self._check_exchange_api_support(self.exchange1)
+        self._check_exchange_api_support(self.exchange2)
 
         await self.update_balance()
         await self.update_open_orders()
@@ -122,6 +125,14 @@ class Bricklayer(object):
         # wait order book
         await asyncio.sleep(10)
         await self.move_brick()
+
+    def _check_exchange_api_support(self, exchange):
+        api_items = ['fetchBalance', 'fetchOpenOrders', 'createOrder', 'cancelOrder']
+        for api_item in api_items:
+            if not exchange.has[api_item]:
+                raise RuntimeError("{} not support {}".format(exchange.id, api_item))
+        if not exchange.has['fetchOrder'] and not exchange.has['fetchOpenOrder']:
+            raise RuntimeError("{} not support {}".format(exchange.id, 'fetchOpenOrder'))
 
     async def _timer_tasks(self):
         while True:
@@ -275,7 +286,7 @@ class Bricklayer(object):
         await asyncio.sleep(1)  # bibox 下单后有时不能马上查询到
 
         if 'status' not in order:
-            order = await exchange.fetch_order(order['id'], self.config.symbol)
+            order = await self._fetch_order(exchange, order['id'], self.config.symbol, num)
             logger.debug("%s %s_order resp %s", kind, trade_type, order)
 
         logger.debug("%s %s_order %s filled %s", kind, trade_type, order['id'], order['filled'])
@@ -286,7 +297,7 @@ class Bricklayer(object):
 
         for i in range(1, 4):
             await asyncio.sleep(i)
-            order = await exchange.fetch_order(order['id'], self.config.symbol)
+            order = await self._fetch_order(exchange, order['id'], self.config.symbol, num)
             if order['status'] == 'closed':
                 logger.debug("%s %s_order %s status closed", kind, trade_type, order['id'])
                 success = True
@@ -298,6 +309,14 @@ class Bricklayer(object):
                         logger.debug("%s %s_order %s cancel_order resp %s", kind, trade_type, order['id'], resp)
                         # 有可能存在数值差,刚好已经成交了,但在 ccxt 有些市场不支持获取非 open status 的订单,所以只能取老的值
         return {"success": success, "filled_num": order['filled'], "remaining_num": order['remaining'], "order_id": order['id']}
+
+    async def _fetch_order(self, exchange, order_id, order_symbol, num):
+        if exchange.has('fetchOrder'):
+            return await exchange.fetch_order(order_id, order_symbol)
+        try:
+            return await exchange.fetch_open_order(order_id, order_symbol)
+        except ccxt.OrderNotFound:
+            return {'id': order_id, 'filled': num, 'remaining': 0.0, 'status': 'closed'}
 
     def get_last_ask(self, asks, idx=0):
         # 卖单价越低越靠前
