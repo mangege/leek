@@ -311,7 +311,7 @@ class Bricklayer(object):
         return {"success": success, "filled_num": order['filled'], "remaining_num": order['remaining'], "order_id": order['id']}
 
     async def _fetch_order(self, exchange, order_id, order_symbol, num):
-        if exchange.has('fetchOrder'):
+        if exchange.has['fetchOrder']:
             return await exchange.fetch_order(order_id, order_symbol)
         try:
             return await exchange.fetch_open_order(order_id, order_symbol)
