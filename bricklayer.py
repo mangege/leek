@@ -131,8 +131,6 @@ class Bricklayer(object):
         for api_item in api_items:
             if not exchange.has[api_item]:
                 raise RuntimeError("{} not support {}".format(exchange.id, api_item))
-        if not exchange.has['fetchOrder'] and not exchange.has['fetchOpenOrder']:
-            raise RuntimeError("{} not support {}".format(exchange.id, 'fetchOpenOrder'))
 
     async def _timer_tasks(self):
         while True:
@@ -313,10 +311,11 @@ class Bricklayer(object):
     async def _fetch_order(self, exchange, order_id, order_symbol, num):
         if exchange.has['fetchOrder']:
             return await exchange.fetch_order(order_id, order_symbol)
-        try:
-            return await exchange.fetch_open_order(order_id, order_symbol)
-        except ccxt.OrderNotFound:
+        orders = await exchange.fetch_open_orders(symbol=order_symbol)
+        orders = [order for order in orders if order['id'] == order_id]
+        if len(orders) == 0:
             return {'id': order_id, 'filled': num, 'remaining': 0.0, 'status': 'closed'}
+        return orders[0]
 
     def get_last_ask(self, asks, idx=0):
         # 卖单价越低越靠前
