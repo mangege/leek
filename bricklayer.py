@@ -264,11 +264,11 @@ class Bricklayer(object):
             logger.debug('%s 交易成功,name %s buy_num %s 纯利润率 %s 大概利润 %s', kind, self.config.name, filled_num, pure_profit,
                          '{:.32f}'.format(filled_num * ask[0] * pure_profit))
             return
-        if num < self.get_min_buy_num_limit(min_price):
+        price = ask[0] + ask[0] * (self.get_exchange_fee_rate(bid[0]) + 0.002)  # 加 0.2%的滑点
+        if num < self.get_min_buy_num_limit(price):
             # TODO 导致 base coin 一直增加,是否考虑直接市价卖了,但有些市场又不支持市价交易接口
             logger.debug("%s sell_order order_id %s lt limit %s", kind, ret['order_id'], num)
             return
-        price = ask[0] + ask[0] * (self.get_exchange_fee_rate(bid[0]) + 0.002)  # 加 0.2%的滑点
         ret = await self.new_order(kind, 'sell', bid_exchange, price, num, False)
         logger.debug("%s stop loss order id %s num %s stop price %s ask price %s", kind, ret['order_id'], num, price, ask[0])
         if ret['success']:
