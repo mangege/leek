@@ -224,7 +224,7 @@ class Bricklayer(object):
 
         min_price = min(ask[0], bid[0])
         min_buy_num_limit = self.get_min_buy_num_limit(min_price)
-        max_buy_num = ask_exchange_quote_coin_num / ask[0]
+        max_buy_num = (ask_exchange_quote_coin_num / ask[0]) * 0.97
         max_sell_num = bid_exchange_base_coin_num
         if max_buy_num < min_buy_num_limit:
             logger.debug('%s quote coin %s 的数量过少 %s', kind, self.config.quote_coin, max_buy_num)
