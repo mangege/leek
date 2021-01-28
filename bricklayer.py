@@ -1,5 +1,4 @@
 import asyncio
-import ccxt
 import ccxtws
 from sortedcontainers import SortedDict
 from . import logutils
@@ -79,8 +78,6 @@ class Bricklayer(object):
         self.exchange2_observer = getattr(ccxtws, f'{self.exchange2.id}_observer')(self.exchange2, self.config.symbol, self.exchange2_ws_callback)
         self.exchange1_ws.subscribe(self.exchange1_observer)
         self.exchange2_ws.subscribe(self.exchange2_observer)
-        asyncio.create_task(self.exchange1_ws.run())
-        asyncio.create_task(self.exchange2_ws.run())
 
     async def move_brick(self):
         prohibited_transaction = False
