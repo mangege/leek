@@ -11,8 +11,14 @@ notifier = utils.get_airbrake_notifier()
 class Bricklayer(object):
     def __init__(self, config):
         self.config = config
-        self.exchange1 = utils.get_exchange(config.exchange1_id, {'apiKey': config.exchange1_api_key, 'secret': config.exchange1_secret})
-        self.exchange2 = utils.get_exchange(config.exchange2_id, {'apiKey': config.exchange2_api_key, 'secret': config.exchange2_secret})
+        exchange1_options = {'apiKey': config.exchange1_api_key, 'secret': config.exchange1_secret}
+        if config.exchange1_password is not None:
+            exchange1_options['password'] = config.exchange1_password
+        self.exchange1 = utils.get_exchange(config.exchange1_id, exchange1_options)
+        exchange2_options = {'apiKey': config.exchange2_api_key, 'secret': config.exchange2_secret}
+        if config.exchange2_password is not None:
+            exchange2_options['password'] = config.exchange2_password
+        self.exchange2 = utils.get_exchange(config.exchange2_id, exchange2_options)
 
         self.exchange1_base_coin_balance = 0.0
         self.exchange1_quote_coin_balance = 0.0
