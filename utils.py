@@ -16,9 +16,12 @@ def get_exchange_options(exchange_id):
     options = {}
     api_key = os.environ.get('{}_API_KEY'.format(exchange_id.upper()))
     secret = os.environ.get('{}_SECRET'.format(exchange_id.upper()))
+    password = os.environ.get('{}_PASSWORD'.format(exchange_id.upper()), None)
     if api_key and secret:
         options['apiKey'] = api_key
         options['secret'] = secret
+        if password is not None:
+            options['password'] = password
     return options
 
 
