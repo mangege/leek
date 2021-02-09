@@ -36,7 +36,49 @@ class Bricklayer(object):
         self.exchange2_asks = SortedDict()
         self.exchange2_bids = SortedDict()
 
+        # balance_alert
+        self.exchange1_base_coin_alerted = False
+        self.exchange1_quote_coin_alerted = False
+        self.exchange2_base_coin_alerted = False
+        self.exchange2_quote_coin_alerted = False
+
         self.api_call_lock = asyncio.Lock()
+
+    async def balance_alert(self):
+        if self.exchange1_base_coin_alerted:
+            if self.exchange1_base_coin_balance >= self.config.base_coin_alert_num:
+                self.exchange1_base_coin_alerted = False
+        else:
+            if self.exchange1_base_coin_balance < self.config.base_coin_alert_num:
+                self.balance_alert_notice(self.config.base_coin, self.exchange1_base_coin_balance)
+                self.exchange1_base_coin_alerted = True
+        if self.exchange1_quote_coin_alerted:
+            if self.exchange1_quote_coin_balance >= self.config.quote_coin_alert_num:
+                self.exchange1_quote_coin_alerted = False
+        else:
+            if self.exchange1_quote_coin_balance < self.config.quote_coin_alert_num:
+                self.exchange1_quote_coin_alerted = True
+                self.balance_alert_notice(self.config.quote_coin, self.exchange1_quote_coin_balance)
+        if self.exchange2_base_coin_alerted:
+            if self.exchange2_base_coin_balance >= self.config.base_coin_alert_num:
+                self.exchange2_base_coin_alerted = False
+        else:
+            if self.exchange2_base_coin_balance < self.config.base_coin_alert_num:
+                self.balance_alert_notice(self.config.base_coin, self.exchange2_base_coin_balance)
+                self.exchange2_base_coin_alerted = True
+        if self.exchange2_quote_coin_alerted:
+            if self.exchange2_quote_coin_balance >= self.config.quote_coin_alert_num:
+                self.exchange2_quote_coin_alerted = False
+        else:
+            if self.exchange2_quote_coin_balance < self.config.quote_coin_alert_num:
+                self.exchange2_quote_coin_alerted = True
+                self.balance_alert_notice(self.config.quote_coin, self.exchange2_quote_coin_balance)
+
+    def balance_alert_notice(self, coin_name, num):
+        msg = f"{coin_name} {num} alert, {self.config.name}"
+        notice = notifier.build_notice(msg)
+        notice['params']['name'] = self.config.name
+        notifier.send_notice(notice)
 
     async def update_balance(self):
         try:
@@ -141,6 +183,7 @@ class Bricklayer(object):
             try:
                 async with self.api_call_lock:
                     await self.update_balance()
+                    await self.balance_alert()
                     await self.update_open_orders()
             except Exception as e:
                 logger.exception(e)
