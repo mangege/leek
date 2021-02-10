@@ -50,7 +50,7 @@ class Bricklayer(object):
                 self.exchange1_base_coin_alerted = False
         else:
             if self.exchange1_base_coin_balance < self.config.base_coin_alert_num:
-                self.balance_alert_notice(self.config.base_coin, self.exchange1_base_coin_balance)
+                self.balance_alert_notice(self.exchange1.id, self.config.base_coin, self.exchange1_base_coin_balance)
                 self.exchange1_base_coin_alerted = True
         if self.exchange1_quote_coin_alerted:
             if self.exchange1_quote_coin_balance >= self.config.quote_coin_alert_num:
@@ -58,13 +58,13 @@ class Bricklayer(object):
         else:
             if self.exchange1_quote_coin_balance < self.config.quote_coin_alert_num:
                 self.exchange1_quote_coin_alerted = True
-                self.balance_alert_notice(self.config.quote_coin, self.exchange1_quote_coin_balance)
+                self.balance_alert_notice(self.exchange1.id, self.config.quote_coin, self.exchange1_quote_coin_balance)
         if self.exchange2_base_coin_alerted:
             if self.exchange2_base_coin_balance >= self.config.base_coin_alert_num:
                 self.exchange2_base_coin_alerted = False
         else:
             if self.exchange2_base_coin_balance < self.config.base_coin_alert_num:
-                self.balance_alert_notice(self.config.base_coin, self.exchange2_base_coin_balance)
+                self.balance_alert_notice(self.exchange2.id, self.config.base_coin, self.exchange2_base_coin_balance)
                 self.exchange2_base_coin_alerted = True
         if self.exchange2_quote_coin_alerted:
             if self.exchange2_quote_coin_balance >= self.config.quote_coin_alert_num:
@@ -72,10 +72,10 @@ class Bricklayer(object):
         else:
             if self.exchange2_quote_coin_balance < self.config.quote_coin_alert_num:
                 self.exchange2_quote_coin_alerted = True
-                self.balance_alert_notice(self.config.quote_coin, self.exchange2_quote_coin_balance)
+                self.balance_alert_notice(self.exchange2.id, self.config.quote_coin, self.exchange2_quote_coin_balance)
 
-    def balance_alert_notice(self, coin_name, num):
-        msg = f"{coin_name} {num} alert, {self.config.name}"
+    def balance_alert_notice(self, exchange_id, coin_name, num):
+        msg = f"{exchange_id} {coin_name} {num} alert, {self.config.name}"
         notice = notifier.build_notice(msg)
         notice['params']['name'] = self.config.name
         notifier.send_notice(notice)
