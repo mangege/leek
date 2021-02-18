@@ -296,7 +296,7 @@ class Bricklayer(object):
             return  # 无成交
         min_price = min(ask[0], bid[0])
         # 66.6 个数量,下单后有可能交易所订单变成 66.0 个,导致后面不满足最低交易金额限制.所以增加 2% 的金额差异用来填平小数差
-        if num < (self.get_min_buy_num_limit(min_price) * 0.98):
+        if num < (self.get_min_buy_num_limit(min_price) * 0.80):
             # TODO 导致 base coin 一直增加,是否考虑直接市价卖了,但有些市场又不支持市价交易接口
             logger.debug("%s buy_order order_id %s lt limit %s", kind, ret['order_id'], num)
             return
@@ -309,7 +309,7 @@ class Bricklayer(object):
                          '{:.32f}'.format(filled_num * ask[0] * pure_profit))
             return
         price = ask[0] + ask[0] * (self.get_exchange_fee_rate(bid[0]) + 0.002)  # 加 0.2%的滑点
-        if num < (self.get_min_buy_num_limit(price) * 0.98):
+        if num < (self.get_min_buy_num_limit(price) * 0.80):
             # TODO 导致 base coin 一直增加,是否考虑直接市价卖了,但有些市场又不支持市价交易接口
             logger.debug("%s sell_order order_id %s lt limit %s", kind, ret['order_id'], num)
             return
