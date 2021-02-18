@@ -128,14 +128,10 @@ class Bricklayer(object):
         self.exchange2_ws.subscribe(self.exchange2_observer)
 
     async def move_brick(self):
-        prohibited_transaction = False
         while True:
             if utils.exit_signal:
                 print("catch exit_signal")
                 break
-            if prohibited_transaction:
-                await asyncio.sleep(60)
-                continue
             await asyncio.sleep(1)
             try:
                 await self._buy_low_and_sell_high(self.exchange1, self.exchange1_asks, self.exchange1_bids, self.exchange2, self.exchange2_asks,
@@ -145,11 +141,12 @@ class Bricklayer(object):
                                                   self.exchange1_bids, self.exchange2_quote_coin_balance, self.exchange1_base_coin_balance,
                                                   self.config.two_to_one_pure_profit_limit)
             except Exception as e:
-                prohibited_transaction = True
                 logger.exception(e)
                 notice = notifier.build_notice(e)
                 notice['params']['name'] = self.config.name
                 notifier.send_notice(notice)
+                # 接口异常时暂停一小时再试
+                await asyncio.sleep(60 * 60)
 
     async def run(self):
         # load dep data
