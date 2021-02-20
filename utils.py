@@ -1,6 +1,7 @@
 import os
 import asyncio
-import ccxt.async_support as ccxt
+import ccxt.async_support as asyncccxt
+import ccxt
 import ccxtws
 import pybrake
 
@@ -26,6 +27,17 @@ def get_exchange_options(exchange_id):
 
 
 def get_exchange(exchange_id, options=None):
+    if options is None:
+        options = get_exchange_options(exchange_id)
+    exchange = None
+    if exchange_id in asyncccxt.exchanges:
+        exchange = getattr(asyncccxt, exchange_id)(options)
+    else:
+        raise
+    return exchange
+
+
+def get_exchange_sync(exchange_id, options=None):
     if options is None:
         options = get_exchange_options(exchange_id)
     exchange = None
