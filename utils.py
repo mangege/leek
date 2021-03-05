@@ -11,6 +11,7 @@ exit_signal_count = 0
 
 
 EXCHANGE_WSS = {}
+NEW_EXCHANGE_WSS = []
 
 
 def get_exchange_options(exchange_id):
@@ -48,7 +49,11 @@ def get_exchange_sync(exchange_id, options=None):
     return exchange
 
 
-def get_exchange_ws(exchange_id):
+def get_exchange_ws(exchange_id, newobj=None):
+    if newobj:
+        exchange_ws = getattr(ccxtws, exchange_id)()
+        NEW_EXCHANGE_WSS.append(exchange_ws)
+        return exchange_ws
     if exchange_id in EXCHANGE_WSS:
         return EXCHANGE_WSS[exchange_id]
     exchange_ws = getattr(ccxtws, exchange_id)()
@@ -59,6 +64,8 @@ def get_exchange_ws(exchange_id):
 async def run_all_exchange_ws():
     await asyncio.sleep(10)
     for exchange_id, exchange_ws in EXCHANGE_WSS.items():
+        asyncio.create_task(exchange_ws.run())
+    for exchange_ws in NEW_EXCHANGE_WSS:
         asyncio.create_task(exchange_ws.run())
 
 

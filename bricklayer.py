@@ -120,8 +120,8 @@ class Bricklayer(object):
 
     # run one
     async def update_order_book(self):
-        self.exchange1_ws = utils.get_exchange_ws(self.exchange1.id)
-        self.exchange2_ws = utils.get_exchange_ws(self.exchange2.id)
+        self.exchange1_ws = utils.get_exchange_ws(self.exchange1.id, self.config.exchange1_new_ws)
+        self.exchange2_ws = utils.get_exchange_ws(self.exchange2.id, self.config.exchange2_new_ws)
         self.exchange1_observer = getattr(ccxtws, f'{self.exchange1.id}_observer')(self.exchange1, self.config.symbol, self.exchange1_ws_callback)
         self.exchange2_observer = getattr(ccxtws, f'{self.exchange2.id}_observer')(self.exchange2, self.config.symbol, self.exchange2_ws_callback)
         self.exchange1_ws.subscribe(self.exchange1_observer)

@@ -18,9 +18,11 @@ class ArbitrageConfig(object):
         self.exchange1_api_key = options['exchange1_api_key']  # api key
         self.exchange1_secret = options['exchange1_secret']
         self.exchange1_password = options.get('exchange1_password', None)
+        self.exchange1_new_ws = options.get('exchange1_new_ws', None)
         self.exchange2_api_key = options['exchange2_api_key']
         self.exchange2_secret = options['exchange2_secret']
         self.exchange2_password = options.get('exchange2_password', None)
+        self.exchange2_new_ws = options.get('exchange2_new_ws', None)
         self.exchange1_id = options['exchange1_id']
         self.exchange2_id = options['exchange2_id']
         self.exchange1_taker_fee = float(options['exchange1_taker_fee'])  # 市场1吃单成交费用, 1% 之类的
