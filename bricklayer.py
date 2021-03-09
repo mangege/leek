@@ -157,7 +157,9 @@ class Bricklayer(object):
         self._check_exchange_api_support(self.exchange1)
         self._check_exchange_api_support(self.exchange2)
 
+        await asyncio.sleep(1)
         await self.update_balance()
+        await asyncio.sleep(1)
         await self.update_open_orders()
 
         await self.update_order_book()
@@ -179,8 +181,10 @@ class Bricklayer(object):
             await asyncio.sleep(180)
             try:
                 async with self.api_call_lock:
+                    await asyncio.sleep(1)
                     await self.update_balance()
                     await self.balance_alert()
+                    await asyncio.sleep(1)
                     await self.update_open_orders()
             except Exception as e:
                 logger.exception(e)
@@ -283,9 +287,11 @@ class Bricklayer(object):
         try:
             async with self.api_call_lock:
                 await self._move_brick_trading(kind, ask_exchange, bid_exchange, ask, bid, buy_num, pure_profit)
+                await asyncio.sleep(1)
                 await self.update_balance()
         except Exception as e:
             logger.exception(e)
+            await asyncio.sleep(1)
             await self.update_balance()
             raise e
 
