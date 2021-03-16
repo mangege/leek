@@ -62,7 +62,7 @@ def get_exchange_ws(exchange_id, newobj=None):
 
 
 async def run_all_exchange_ws():
-    await asyncio.sleep(10)
+    await asyncio.sleep(60)
     for exchange_id, exchange_ws in EXCHANGE_WSS.items():
         asyncio.create_task(exchange_ws.run())
     for exchange_ws in NEW_EXCHANGE_WSS:

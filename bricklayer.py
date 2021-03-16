@@ -155,14 +155,9 @@ class Bricklayer(object):
         self._check_exchange_api_support(self.exchange1)
         self._check_exchange_api_support(self.exchange2)
 
-        while True:
-            try:
-                await self.exchange1.load_markets()
-                await self.exchange2.load_markets()
-                break
-            except Exception as e:
-                logger.exception(e)
-                await asyncio.sleep(60)
+        await self.exchange1.load_markets()
+        await self.exchange2.load_markets()
+
         try:
             await asyncio.sleep(random.randint(1, 3))
             await self.update_balance()
