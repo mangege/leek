@@ -1,5 +1,6 @@
 import asyncio
 import ccxtws
+import random
 from sortedcontainers import SortedDict
 from . import logutils
 from . import utils
@@ -157,10 +158,11 @@ class Bricklayer(object):
         self._check_exchange_api_support(self.exchange1)
         self._check_exchange_api_support(self.exchange2)
 
-        await asyncio.sleep(1)
+        await asyncio.sleep(random.randint(1, 3))
         await self.update_balance()
-        await asyncio.sleep(1)
+        await asyncio.sleep(random.randint(1, 3))
         await self.update_open_orders()
+        await asyncio.sleep(random.randint(1, 3))
 
         await self.update_order_book()
 
@@ -178,13 +180,13 @@ class Bricklayer(object):
 
     async def _timer_tasks(self):
         while True:
-            await asyncio.sleep(180)
+            await asyncio.sleep(random.randint(180, 300))
             try:
                 async with self.api_call_lock:
-                    await asyncio.sleep(1)
+                    await asyncio.sleep(random.randint(1, 3))
                     await self.update_balance()
                     await self.balance_alert()
-                    await asyncio.sleep(1)
+                    await asyncio.sleep(random.randint(1, 3))
                     await self.update_open_orders()
             except Exception as e:
                 logger.exception(e)
