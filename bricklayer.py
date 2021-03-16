@@ -165,7 +165,7 @@ class Bricklayer(object):
             await self.update_open_orders()
             await asyncio.sleep(random.randint(1, 3))
         except Exception as e:
-            raise e
+            logger.exception(e)
 
         await self.update_order_book()
 
