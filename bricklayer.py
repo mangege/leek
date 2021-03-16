@@ -254,10 +254,10 @@ class Bricklayer(object):
 
         # 先记录溢价,再检查是否符合交易条件
         if self.exchange1_open_order_num >= self.config.max_open_order_limit:
-            logger.debug(f'exchange1_open_order_num {self.exchange1_open_order_num} > {self.config.max_open_order_limit}')
+            logger.debug(f'{self.config.name} {self.exchange1.id} open_order_num {self.exchange1_open_order_num} > {self.config.max_open_order_limit}')
             return
         if self.exchange2_open_order_num >= self.config.max_open_order_limit:
-            logger.debug(f'exchange2_open_order_num {self.exchange2_open_order_num} > {self.config.max_open_order_limit}')
+            logger.debug(f'{self.config.name} {self.exchange2.id} open_order_num {self.exchange2_open_order_num} > {self.config.max_open_order_limit}')
             return
 
         fee_rate = (self.get_cross_exchange_fee_rate(bid[0]) if self.config.enable_transfer else self.get_exchange_fee_rate(bid[0]))
