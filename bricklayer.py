@@ -150,19 +150,22 @@ class Bricklayer(object):
                 await asyncio.sleep(60 * 60)
 
     async def run(self):
-        # load dep data
-        await self.exchange1.load_markets()
-        await self.exchange2.load_markets()
         self.exchange1.checkRequiredCredentials()
         self.exchange2.checkRequiredCredentials()
         self._check_exchange_api_support(self.exchange1)
         self._check_exchange_api_support(self.exchange2)
 
-        await asyncio.sleep(random.randint(1, 3))
-        await self.update_balance()
-        await asyncio.sleep(random.randint(1, 3))
-        await self.update_open_orders()
-        await asyncio.sleep(random.randint(1, 3))
+        try:
+            await self.exchange1.load_markets()
+            await self.exchange2.load_markets()
+
+            await asyncio.sleep(random.randint(1, 3))
+            await self.update_balance()
+            await asyncio.sleep(random.randint(1, 3))
+            await self.update_open_orders()
+            await asyncio.sleep(random.randint(1, 3))
+        except Exception as e:
+            raise e
 
         await self.update_order_book()
 
