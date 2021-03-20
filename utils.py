@@ -61,8 +61,12 @@ def get_exchange_ws(exchange_id, newobj=None):
     return exchange_ws
 
 
-async def run_all_exchange_ws():
-    await asyncio.sleep(60)
+async def run_all_exchange_ws(bricklayer_list):
+    while True:
+        if all([bricklayer.is_ready for bricklayer in bricklayer_list]):
+            break
+        await asyncio.sleep(1)
+    print("all ready!")
     for exchange_id, exchange_ws in EXCHANGE_WSS.items():
         asyncio.create_task(exchange_ws.run())
     for exchange_ws in NEW_EXCHANGE_WSS:
